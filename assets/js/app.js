@@ -43,14 +43,10 @@
     paintCartCount();
   }
 
-  function cartTotalItems() {
-    return readCart().reduce(function (sum, item) {
+  function paintCartCount() {
+    var total = readCart().reduce(function (sum, item) {
       return sum + item.qty;
     }, 0);
-  }
-
-  function paintCartCount() {
-    var total = cartTotalItems();
     var nodes = document.querySelectorAll("[data-cart-count]");
     for (var i = 0; i < nodes.length; i++) {
       nodes[i].textContent = String(total);
@@ -59,7 +55,7 @@
 
   function addToCart(slug) {
     var product = bySlug(slug);
-    if (!product || product.price === null) return;
+    if (!product) return;
 
     var cart = readCart();
     var found = false;
@@ -101,35 +97,18 @@
 
   /* -------------------------------------------------------- Templates --- */
 
-  var cartIcon =
-    '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" ' +
-    'stroke="currentColor" stroke-width="1.7" aria-hidden="true">' +
-    '<path d="M6 6h15l-1.6 9H7.5L6 6Z"/><path d="M6 6 5 3H2"/>' +
-    '<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>';
+  var plusIcon =
+    '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="2" stroke-linecap="round" ' +
+    'aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 
   function cardTemplate(product) {
-    var isSubscription = product.price === null;
-    var foot = isSubscription
-      ? '<a class="link-arrow" href="produto.html?slug=' +
-        product.slug +
-        '">Saiba mais &rarr;</a>'
-      : '<div class="price">' +
-        money(product.price) +
-        "<small>" +
-        (product.installments || "") +
-        "</small></div>" +
-        '<button class="icon-btn" type="button" data-add="' +
-        product.slug +
-        '" aria-label="Adicionar ' +
-        product.name +
-        ' à sacola">' +
-        cartIcon +
-        "</button>";
-
     return (
       '<article class="card reveal">' +
       '<a class="card__media" href="produto.html?slug=' +
       product.slug +
+      '" aria-label="' +
+      product.name +
       '">' +
       (product.tag ? '<span class="card__tag">' + product.tag + "</span>" : "") +
       '<img src="' +
@@ -139,20 +118,26 @@
       '" loading="lazy">' +
       "</a>" +
       '<div class="card__body">' +
-      '<span class="card__kicker">' +
-      product.kicker +
-      "</span>" +
+      '<div class="card__info">' +
       '<h3><a href="produto.html?slug=' +
       product.slug +
       '">' +
       product.name +
       "</a></h3>" +
-      "<p>" +
-      product.short +
-      "</p>" +
-      '<div class="card__foot">' +
-      foot +
+      '<div class="price">' +
+      money(product.price) +
       "</div>" +
+      '<div class="installments">' +
+      product.installments +
+      "</div>" +
+      "</div>" +
+      '<button class="icon-btn" type="button" data-add="' +
+      product.slug +
+      '" aria-label="Adicionar ' +
+      product.name +
+      ' à sacola">' +
+      plusIcon +
+      "</button>" +
       "</div>" +
       "</article>"
     );
@@ -221,21 +206,17 @@
 
     document.title = product.name + " — G4 Store";
 
-    var priceBlock =
-      product.price === null
-        ? '<span>Entrada por análise de perfil. Fale com o time para verificar disponibilidade.</span>'
-        : "<strong>" +
-          money(product.price) +
-          "</strong><span>" +
-          (product.installments || "") +
-          " · Frete calculado no checkout</span>";
-
-    var action =
-      product.price === null
-        ? '<a class="btn btn--block" href="mailto:atendimento@g4store.com.br?subject=Interesse%20no%20G4%20Club">Falar com o time &rarr;</a>'
-        : '<button class="btn btn--block" type="button" data-add="' +
-          product.slug +
-          '">Adicionar à sacola &rarr;</button>';
+    var sizes = (product.sizes || [])
+      .map(function (size, index) {
+        return (
+          '<button class="size' +
+          (index === 0 ? " is-active" : "") +
+          '" type="button" data-size>' +
+          size +
+          "</button>"
+        );
+      })
+      .join("");
 
     root.innerHTML =
       '<div class="pdp__media"><img src="' +
@@ -253,10 +234,17 @@
       '<p class="pdp__lead">' +
       product.description +
       "</p>" +
-      '<div class="pdp__price">' +
-      priceBlock +
-      "</div>" +
-      action +
+      '<div class="pdp__price"><strong>' +
+      money(product.price) +
+      "</strong><span>" +
+      product.installments +
+      " · Frete calculado no checkout</span></div>" +
+      (sizes
+        ? '<p class="size-label">Tamanho</p><div class="sizes">' + sizes + "</div>"
+        : "") +
+      '<button class="btn btn--block" type="button" data-add="' +
+      product.slug +
+      '">Adicionar à sacola</button>' +
       '<ul class="pdp__list">' +
       product.highlights
         .map(function (item) {
@@ -265,6 +253,15 @@
         .join("") +
       "</ul>" +
       "</div>";
+
+    root.addEventListener("click", function (event) {
+      var size = event.target.closest("[data-size]");
+      if (!size) return;
+      var all = root.querySelectorAll("[data-size]");
+      for (var i = 0; i < all.length; i++) {
+        all[i].classList.toggle("is-active", all[i] === size);
+      }
+    });
 
     var crumb = document.querySelector("[data-crumb]");
     if (crumb) crumb.textContent = product.name;
@@ -312,8 +309,7 @@
             '">' +
             "<div><strong>" +
             product.name +
-            "</strong><br>" +
-            '<span style="color:var(--text-faint);font-size:12.5px">' +
+            "</strong><br><span>" +
             product.categoryLabel +
             "</span></div></div></td>" +
             "<td>" +
@@ -322,7 +318,7 @@
             '<td><span class="qty">' +
             '<button type="button" data-dec="' +
             product.slug +
-            '" aria-label="Diminuir quantidade">−</button>' +
+            '" aria-label="Diminuir quantidade">&minus;</button>' +
             "<span>" +
             item.qty +
             "</span>" +
@@ -330,16 +326,19 @@
             product.slug +
             '" aria-label="Aumentar quantidade">+</button>' +
             "</span></td>" +
-            '<td class="text-gold">' +
+            "<td><strong>" +
             money(line) +
-            "</td>" +
-            '<td style="text-align:right"><button type="button" data-remove="' +
+            "</strong></td>" +
+            '<td style="text-align:right"><button class="cart-remove" type="button" data-remove="' +
             product.slug +
-            '" style="color:var(--text-faint);font-size:12px">Remover</button></td>' +
+            '">Remover</button></td>' +
             "</tr>"
           );
         })
         .join("");
+
+      var frete = subtotal >= 299 ? "Grátis" : money(29.9);
+      var total = subtotal >= 299 ? subtotal : subtotal + 29.9;
 
       root.innerHTML =
         '<table class="cart-table"><thead><tr>' +
@@ -351,11 +350,13 @@
         '<div class="cart-summary__row"><span>Subtotal</span><span>' +
         money(subtotal) +
         "</span></div>" +
-        '<div class="cart-summary__row"><span>Frete</span><span>Calculado no checkout</span></div>' +
+        '<div class="cart-summary__row"><span>Frete</span><span>' +
+        frete +
+        "</span></div>" +
         '<div class="cart-summary__total"><span>Total</span><strong>' +
-        money(subtotal) +
+        money(total) +
         "</strong></div>" +
-        '<button class="btn btn--block" type="button" data-checkout>Finalizar compra &rarr;</button>' +
+        '<button class="btn btn--block" type="button" data-checkout>Finalizar compra</button>' +
         "</div>";
     }
 
@@ -397,14 +398,13 @@
   function initGlobalClicks() {
     document.addEventListener("click", function (event) {
       var addBtn = event.target.closest("[data-add]");
-      if (addBtn) {
-        event.preventDefault();
-        addToCart(addBtn.getAttribute("data-add"));
-        addBtn.classList.add("is-added");
-        window.setTimeout(function () {
-          addBtn.classList.remove("is-added");
-        }, 1200);
-      }
+      if (!addBtn) return;
+      event.preventDefault();
+      addToCart(addBtn.getAttribute("data-add"));
+      addBtn.classList.add("is-added");
+      window.setTimeout(function () {
+        addBtn.classList.remove("is-added");
+      }, 1200);
     });
   }
 
@@ -419,14 +419,15 @@
   }
 
   function initHeaderSearch() {
-    var form = document.querySelector("[data-header-search]");
-    if (!form) return;
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
-      var value = form.querySelector("input").value.trim();
-      window.location.href =
-        "produtos.html" + (value ? "?q=" + encodeURIComponent(value) : "");
-    });
+    var forms = document.querySelectorAll("[data-header-search]");
+    for (var i = 0; i < forms.length; i++) {
+      forms[i].addEventListener("submit", function (event) {
+        event.preventDefault();
+        var value = event.currentTarget.querySelector("input").value.trim();
+        window.location.href =
+          "produtos.html" + (value ? "?q=" + encodeURIComponent(value) : "");
+      });
+    }
   }
 
   function initNewsletter() {
@@ -434,7 +435,7 @@
     if (!form) return;
     form.addEventListener("submit", function (event) {
       event.preventDefault();
-      var msg = form.parentNode.querySelector("[data-newsletter-msg]");
+      var msg = document.querySelector("[data-newsletter-msg]");
       if (msg) {
         msg.textContent =
           "Inscrição registrada. Você receberá as novidades da G4 Store.";
@@ -468,7 +469,7 @@
             }
           });
         },
-        { threshold: 0.12 }
+        { threshold: 0.1 }
       );
     }
     for (var j = 0; j < nodes.length; j++) observer.observe(nodes[j]);
