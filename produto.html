@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Produto — G4 Store</title>
+<meta name="description" content="Detalhes do produto na G4 Store.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbar__inner">
+    <div class="topbar__claim">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8Z"/></svg>
+      <span>Educação que gera transformação. Negócios que mudam o Brasil.</span>
+    </div>
+    <nav class="topbar__links" aria-label="Atalhos">
+      <a href="sobre.html">Atendimento</a>
+      <a href="#">Entrar</a>
+      <a class="cart-link" href="carrinho.html">Carrinho <span class="cart-count" data-cart-count>0</span></a>
+    </nav>
+  </div>
+</div>
+
+<header class="header">
+  <div class="wrap header__inner">
+    <a class="logo" href="index.html" aria-label="G4 Store — página inicial">
+      <span class="logo__mark">G4</span>
+      <span class="logo__word">Store</span>
+    </a>
+
+    <nav class="nav" data-nav aria-label="Navegação principal">
+      <a href="produtos.html">Todos os produtos</a>
+      <a href="produtos.html?q=livro">Livros</a>
+      <a href="produtos.html?q=imersão">Cursos</a>
+      <a href="produtos.html?q=experiência">Eventos</a>
+      <a href="produtos.html?q=kit">Coleções</a>
+      <a href="sobre.html">Para empresas</a>
+    </nav>
+
+    <form class="search" data-header-search role="search">
+      <input type="search" placeholder="Buscar produtos" aria-label="Buscar produtos">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+    </form>
+
+    <button class="burger" data-burger type="button" aria-label="Abrir menu" aria-expanded="false">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <nav class="breadcrumb" aria-label="Trilha de navegação">
+      <a href="index.html">Início</a> <span>/</span>
+      <a href="produtos.html">Catálogo</a> <span>/</span>
+      <span data-crumb>Produto</span>
+    </nav>
+
+    <div class="pdp" data-product-page></div>
+  </div>
+
+  <section class="showcase">
+    <div class="wrap section section--tight">
+      <div class="section-head">
+        <div>
+          <span class="eyebrow">Combina com</span>
+          <h2>Outros itens da seleção.</h2>
+        </div>
+        <a class="link-arrow" href="produtos.html">Ver todos &rarr;</a>
+      </div>
+      <div class="product-grid product-grid--wide" data-related></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__grid">
+    <div>
+      <a class="logo" href="index.html">
+        <span class="logo__mark">G4</span>
+        <span class="logo__word">Store</span>
+      </a>
+      <p>A loja oficial do ecossistema G4: conteúdo, ferramentas e experiências para quem constrói empresas relevantes no Brasil.</p>
+    </div>
+    <div>
+      <h4>Produtos</h4>
+      <ul>
+        <li><a href="produtos.html">Todos os produtos</a></li>
+        <li><a href="produtos.html?q=livro">Livros</a></li>
+        <li><a href="produtos.html?q=caderno">Objetos</a></li>
+        <li><a href="produtos.html?q=imersão">Experiências</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Institucional</h4>
+      <ul>
+        <li><a href="sobre.html">Sobre a G4 Store</a></li>
+        <li><a href="sobre.html#empresas">Para empresas</a></li>
+        <li><a href="sobre.html#faq">Perguntas frequentes</a></li>
+        <li><a href="sobre.html#contato">Contato</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Atendimento</h4>
+      <ul>
+        <li><a href="mailto:atendimento@g4store.com.br">atendimento@g4store.com.br</a></li>
+        <li><a href="sobre.html#faq">Trocas e devoluções</a></li>
+        <li><a href="sobre.html#faq">Prazos de entrega</a></li>
+        <li><a href="carrinho.html">Minha sacola</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer__bar">
+    <span>&copy; <span data-year>2026</span> G4 Store · Projeto de interface</span>
+    <span>São Paulo — Brasil</span>
+  </div>
+</footer>
+
+<div class="toast" data-toast role="status" aria-live="polite"></div>
+
+<script src="assets/js/products.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
