@@ -1,12 +1,16 @@
 /**
  * G4 Store — comportamento do front-end.
  * Sem dependências externas: carrinho em localStorage, catálogo, filtros,
- * menu mobile, newsletter e animação de entrada.
+ * menu mobile acessível, animações de entrada e feedback de ações.
  */
 (function () {
   "use strict";
 
+  document.documentElement.classList.add("js");
+
   var STORAGE_KEY = "g4store.cart.v1";
+  var FREE_SHIPPING = 299;
+  var SHIPPING_COST = 29.9;
   var products = window.G4_PRODUCTS || [];
 
   /* ----------------------------------------------------------- Helpers --- */
@@ -40,16 +44,22 @@
     } catch (err) {
       /* modo privado: segue sem persistir */
     }
-    paintCartCount();
+    paintCartCount(true);
   }
 
-  function paintCartCount() {
+  function paintCartCount(pulse) {
     var total = readCart().reduce(function (sum, item) {
       return sum + item.qty;
     }, 0);
     var nodes = document.querySelectorAll("[data-cart-count]");
     for (var i = 0; i < nodes.length; i++) {
       nodes[i].textContent = String(total);
+      if (pulse) {
+        nodes[i].classList.remove("is-pulse");
+        /* força o reinício da animação */
+        void nodes[i].offsetWidth;
+        nodes[i].classList.add("is-pulse");
+      }
     }
   }
 
@@ -95,6 +105,33 @@
     }, 2600);
   }
 
+  /** Faz as fotos aparecerem só depois de carregadas, evitando o "pop". */
+  function hydrateImages(scope) {
+    var imgs = (scope || document).querySelectorAll("img:not(.is-loaded)");
+    for (var i = 0; i < imgs.length; i++) {
+      (function (img) {
+        if (img.complete && img.naturalWidth > 0) {
+          img.classList.add("is-loaded");
+        } else {
+          img.addEventListener(
+            "load",
+            function () {
+              img.classList.add("is-loaded");
+            },
+            { once: true }
+          );
+          img.addEventListener(
+            "error",
+            function () {
+              img.classList.add("is-loaded");
+            },
+            { once: true }
+          );
+        }
+      })(imgs[i]);
+    }
+  }
+
   /* -------------------------------------------------------- Templates --- */
 
   var plusIcon =
@@ -102,20 +139,36 @@
     'stroke="currentColor" stroke-width="2" stroke-linecap="round" ' +
     'aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
 
-  function cardTemplate(product) {
+  function pictureTemplate(product, sizes, eager) {
     return (
-      '<article class="card reveal">' +
-      '<a class="card__media" href="produto.html?slug=' +
-      product.slug +
-      '" aria-label="' +
-      product.name +
+      "<picture>" +
+      '<source type="image/webp" srcset="' +
+      product.webp +
       '">' +
-      (product.tag ? '<span class="card__tag">' + product.tag + "</span>" : "") +
       '<img src="' +
       product.image +
       '" alt="' +
       product.name +
-      '" loading="lazy">' +
+      '" width="900" height="900" sizes="' +
+      sizes +
+      '" ' +
+      (eager ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"') +
+      ">" +
+      "</picture>"
+    );
+  }
+
+  function cardTemplate(product, index) {
+    return (
+      '<article class="card reveal" style="--i:' +
+      (index % 4) +
+      '">' +
+      /* a foto repete o destino do título: fica fora da ordem de tabulação */
+      '<a class="card__media" href="produto.html?slug=' +
+      product.slug +
+      '" tabindex="-1" aria-hidden="true">' +
+      (product.tag ? '<span class="card__tag">' + product.tag + "</span>" : "") +
+      pictureTemplate(product, "(max-width: 600px) 92vw, (max-width: 1040px) 44vw, 300px") +
       "</a>" +
       '<div class="card__body">' +
       '<div class="card__info">' +
@@ -146,10 +199,11 @@
   function renderGrid(target, list) {
     if (!list.length) {
       target.innerHTML =
-        '<p class="empty">Nenhum produto encontrado para esta busca.</p>';
+        '<p class="empty">Nenhum produto encontrado para esta busca</p>';
       return;
     }
     target.innerHTML = list.map(cardTemplate).join("");
+    hydrateImages(target);
     observeReveals();
   }
 
@@ -158,6 +212,11 @@
   function initHomeShowcase() {
     var target = document.querySelector("[data-showcase]");
     if (!target) return;
+    /* a home já vem renderizada no HTML: aqui só hidratamos */
+    if (target.getAttribute("data-static") === "1") {
+      hydrateImages(target);
+      return;
+    }
     renderGrid(target, products.slice(0, 4));
   }
 
@@ -167,6 +226,7 @@
 
     var chips = document.querySelectorAll("[data-filter]");
     var searchInput = document.querySelector("[data-search]");
+    var counter = document.querySelector("[data-count]");
     var active = "todos";
 
     function apply() {
@@ -181,19 +241,42 @@
         return matchCategory && matchTerm;
       });
       renderGrid(target, list);
+      if (counter) {
+        counter.textContent =
+          list.length === 1 ? "1 produto" : list.length + " produtos";
+      }
     }
 
     for (var i = 0; i < chips.length; i++) {
       chips[i].addEventListener("click", function (event) {
         active = event.currentTarget.getAttribute("data-filter");
         for (var j = 0; j < chips.length; j++) {
-          chips[j].classList.toggle("is-active", chips[j] === event.currentTarget);
+          var isOn = chips[j] === event.currentTarget;
+          chips[j].classList.toggle("is-active", isOn);
+          chips[j].setAttribute("aria-pressed", isOn ? "true" : "false");
         }
         apply();
       });
     }
 
     if (searchInput) searchInput.addEventListener("input", apply);
+
+    /* pré-seleciona a categoria vinda do menu */
+    var q = new URLSearchParams(window.location.search).get("q");
+    if (q) {
+      var normalized = q.toLowerCase();
+      var map = { vestuário: "vestuario", acessórios: "acessorios" };
+      if (map[normalized]) {
+        active = map[normalized];
+        for (var k = 0; k < chips.length; k++) {
+          var on = chips[k].getAttribute("data-filter") === active;
+          chips[k].classList.toggle("is-active", on);
+          chips[k].setAttribute("aria-pressed", on ? "true" : "false");
+        }
+        if (searchInput) searchInput.value = "";
+      }
+    }
+
     apply();
   }
 
@@ -211,7 +294,9 @@
         return (
           '<button class="size' +
           (index === 0 ? " is-active" : "") +
-          '" type="button" data-size>' +
+          '" type="button" data-size aria-pressed="' +
+          (index === 0 ? "true" : "false") +
+          '">' +
           size +
           "</button>"
         );
@@ -219,11 +304,9 @@
       .join("");
 
     root.innerHTML =
-      '<div class="pdp__media"><img src="' +
-      product.image +
-      '" alt="' +
-      product.name +
-      '"></div>' +
+      '<div class="pdp__media">' +
+      pictureTemplate(product, "(max-width: 1040px) 92vw, 620px", true) +
+      "</div>" +
       "<div>" +
       '<span class="eyebrow">' +
       product.categoryLabel +
@@ -254,12 +337,16 @@
       "</ul>" +
       "</div>";
 
+    hydrateImages(root);
+
     root.addEventListener("click", function (event) {
       var size = event.target.closest("[data-size]");
       if (!size) return;
       var all = root.querySelectorAll("[data-size]");
       for (var i = 0; i < all.length; i++) {
-        all[i].classList.toggle("is-active", all[i] === size);
+        var on = all[i] === size;
+        all[i].classList.toggle("is-active", on);
+        all[i].setAttribute("aria-pressed", on ? "true" : "false");
       }
     });
 
@@ -272,7 +359,7 @@
         related,
         products
           .filter(function (item) {
-            return item.slug !== product.slug;
+            return item.category === product.category && item.slug !== product.slug;
           })
           .slice(0, 3)
       );
@@ -285,10 +372,17 @@
 
     function paint() {
       var cart = readCart();
+
       if (!cart.length) {
         root.innerHTML =
-          '<p class="empty">Sua sacola está vazia &mdash; ' +
-          '<a class="link-arrow" href="produtos.html">Ver produtos &rarr;</a></p>';
+          '<div class="empty-state">' +
+          '<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+          'stroke-width="1.4" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Z"/>' +
+          '<path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>' +
+          "<h3>Sua sacola está vazia</h3>" +
+          "<p>Escolha uma peça da coleção para começar</p>" +
+          '<a class="btn" href="produtos.html">Ver coleção</a>' +
+          "</div>";
         return;
       }
 
@@ -304,9 +398,7 @@
             '<td><div class="cart-item">' +
             '<img src="' +
             product.image +
-            '" alt="' +
-            product.name +
-            '">' +
+            '" alt="" width="900" height="900" loading="lazy">' +
             "<div><strong>" +
             product.name +
             "</strong><br><span>" +
@@ -318,13 +410,17 @@
             '<td><span class="qty">' +
             '<button type="button" data-dec="' +
             product.slug +
-            '" aria-label="Diminuir quantidade">&minus;</button>' +
+            '" aria-label="Diminuir quantidade de ' +
+            product.name +
+            '">&minus;</button>' +
             "<span>" +
             item.qty +
             "</span>" +
             '<button type="button" data-inc="' +
             product.slug +
-            '" aria-label="Aumentar quantidade">+</button>' +
+            '" aria-label="Aumentar quantidade de ' +
+            product.name +
+            '">+</button>' +
             "</span></td>" +
             "<td><strong>" +
             money(line) +
@@ -337,8 +433,9 @@
         })
         .join("");
 
-      var frete = subtotal >= 299 ? "Grátis" : money(29.9);
-      var total = subtotal >= 299 ? subtotal : subtotal + 29.9;
+      var free = subtotal >= FREE_SHIPPING;
+      var total = free ? subtotal : subtotal + SHIPPING_COST;
+      var missing = FREE_SHIPPING - subtotal;
 
       root.innerHTML =
         '<table class="cart-table"><thead><tr>' +
@@ -351,13 +448,20 @@
         money(subtotal) +
         "</span></div>" +
         '<div class="cart-summary__row"><span>Frete</span><span>' +
-        frete +
+        (free ? "Grátis" : money(SHIPPING_COST)) +
         "</span></div>" +
+        (free
+          ? ""
+          : '<p class="cart-hint">Faltam ' +
+            money(missing) +
+            " para o frete grátis</p>") +
         '<div class="cart-summary__total"><span>Total</span><strong>' +
         money(total) +
         "</strong></div>" +
         '<button class="btn btn--block" type="button" data-checkout>Finalizar compra</button>' +
         "</div>";
+
+      hydrateImages(root);
     }
 
     root.addEventListener("click", function (event) {
@@ -412,9 +516,29 @@
     var burger = document.querySelector("[data-burger]");
     var nav = document.querySelector("[data-nav]");
     if (!burger || !nav) return;
-    burger.addEventListener("click", function () {
-      var open = nav.classList.toggle("is-open");
+
+    function setOpen(open) {
+      nav.classList.toggle("is-open", open);
       burger.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) {
+        var first = nav.querySelector("a");
+        if (first) first.focus();
+      }
+    }
+
+    burger.addEventListener("click", function () {
+      setOpen(!nav.classList.contains("is-open"));
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && nav.classList.contains("is-open")) {
+        setOpen(false);
+        burger.focus();
+      }
+    });
+
+    nav.addEventListener("click", function (event) {
+      if (event.target.closest("a")) setOpen(false);
     });
   }
 
@@ -444,11 +568,29 @@
     });
   }
 
-  function prefillCatalogSearch() {
-    var input = document.querySelector("[data-search]");
-    if (!input) return;
-    var q = new URLSearchParams(window.location.search).get("q");
-    if (q) input.value = q;
+  /** Marca no menu o item correspondente à página/filtro atual. */
+  function initActiveNav() {
+    var links = document.querySelectorAll(".nav a");
+    var path = window.location.pathname.split("/").pop() || "index.html";
+    var query = new URLSearchParams(window.location.search).get("q");
+
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute("href") || "";
+      var parts = href.split("?");
+      var target = parts[0];
+      var targetQuery = parts[1]
+        ? new URLSearchParams(parts[1]).get("q")
+        : null;
+
+      var samePage = target === path;
+      var sameFilter = (targetQuery || null) === (query || null);
+
+      if (samePage && sameFilter) {
+        links[i].setAttribute("aria-current", "page");
+      } else {
+        links[i].removeAttribute("aria-current");
+      }
+    }
   }
 
   var observer = null;
@@ -469,10 +611,24 @@
             }
           });
         },
-        { threshold: 0.1 }
+        { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
       );
     }
-    for (var j = 0; j < nodes.length; j++) observer.observe(nodes[j]);
+    for (var j = 0; j < nodes.length; j++) {
+      /* cascata: usa a posição do elemento entre os irmãos reveláveis */
+      if (!nodes[j].style.getPropertyValue("--i")) {
+        var siblings = nodes[j].parentNode
+          ? nodes[j].parentNode.querySelectorAll(".reveal")
+          : [];
+        for (var k = 0; k < siblings.length; k++) {
+          if (siblings[k] === nodes[j]) {
+            nodes[j].style.setProperty("--i", String(k));
+            break;
+          }
+        }
+      }
+      observer.observe(nodes[j]);
+    }
   }
 
   function initYear() {
@@ -485,17 +641,18 @@
   /* ------------------------------------------------------------- Boot --- */
 
   document.addEventListener("DOMContentLoaded", function () {
-    paintCartCount();
+    paintCartCount(false);
     initGlobalClicks();
     initBurger();
     initHeaderSearch();
     initNewsletter();
-    prefillCatalogSearch();
+    initActiveNav();
     initHomeShowcase();
     initCatalog();
     initProductPage();
     initCartPage();
     initYear();
+    hydrateImages(document);
     observeReveals();
   });
 })();

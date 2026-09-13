@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Produto — G4 Store</title>
 <meta name="description" content="Detalhes do produto na G4 Store.">
+<meta name="theme-color" content="#0B2137">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="G4 Store">
+<meta property="og:title" content="Produto — G4 Store">
+<meta property="og:description" content="Detalhes do produto na G4 Store.">
+<meta property="og:image" content="assets/img/hero-colecao.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -56,7 +64,7 @@
 
       <a class="bag" href="carrinho.html" aria-label="Ver sacola">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
-        <span class="bag__count" data-cart-count>0</span>
+        <span class="bag__count" data-cart-count aria-live="polite" aria-atomic="true">0</span>
       </a>
 
       <button class="burger" data-burger type="button" aria-label="Abrir menu" aria-expanded="false">
@@ -71,10 +79,18 @@
     <nav class="breadcrumb" aria-label="Trilha de navegação">
       <a href="index.html">Início</a> <span>/</span>
       <a href="produtos.html">Coleção</a> <span>/</span>
-      <span data-crumb>Produto</span>
+      <span data-crumb>Carregando</span>
     </nav>
 
-    <div class="pdp" data-product-page></div>
+    <div class="pdp" data-product-page>
+      <div class="skeleton__media" aria-hidden="true"></div>
+      <div aria-hidden="true">
+        <div class="skeleton__line skeleton__line--sm"></div>
+        <div class="skeleton__line"></div>
+        <div class="skeleton__line"></div>
+        <div class="skeleton__line skeleton__line--sm"></div>
+      </div>
+    </div>
   </div>
 
   <section class="section section--mist">
@@ -86,7 +102,23 @@
         </div>
         <a class="link-arrow" href="produtos.html">Ver todos &rarr;</a>
       </div>
-      <div class="product-grid product-grid--wide" data-related></div>
+      <div class="product-grid product-grid--wide" data-related>
+        <article class="card skeleton" aria-hidden="true">
+          <div class="skeleton__media"></div>
+          <div class="skeleton__line"></div>
+          <div class="skeleton__line skeleton__line--sm"></div>
+        </article>
+        <article class="card skeleton" aria-hidden="true">
+          <div class="skeleton__media"></div>
+          <div class="skeleton__line"></div>
+          <div class="skeleton__line skeleton__line--sm"></div>
+        </article>
+        <article class="card skeleton" aria-hidden="true">
+          <div class="skeleton__media"></div>
+          <div class="skeleton__line"></div>
+          <div class="skeleton__line skeleton__line--sm"></div>
+        </article>
+      </div>
     </div>
   </section>
 </main>

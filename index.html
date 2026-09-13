@@ -5,8 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>G4 Store — Para quem quer mais</title>
 <meta name="description" content="Vista a mentalidade de quem transforma conhecimento em resultado. Vestuário e acessórios oficiais da G4.">
+<meta name="theme-color" content="#0B2137">
+<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="G4 Store">
+<meta property="og:title" content="G4 Store — Para quem quer mais">
+<meta property="og:description" content="Vista a mentalidade de quem transforma conhecimento em resultado.">
+<meta property="og:image" content="assets/img/hero-colecao.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="assets/img/hero-colecao.webp" type="image/webp" fetchpriority="high">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
@@ -56,7 +65,7 @@
 
       <a class="bag" href="carrinho.html" aria-label="Ver sacola">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 8h12l1 12H5L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
-        <span class="bag__count" data-cart-count>0</span>
+        <span class="bag__count" data-cart-count aria-live="polite" aria-atomic="true">0</span>
       </a>
 
       <button class="burger" data-burger type="button" aria-label="Abrir menu" aria-expanded="false">
@@ -71,12 +80,17 @@
   <!-- ============================================================== Hero -->
   <section class="hero">
     <div class="hero__media">
-      <img src="assets/img/hero-colecao.jpg" alt="Time vestindo a coleção G4 Store em ambiente corporativo">
+      <picture>
+        <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/hero-colecao-900.webp">
+        <source type="image/webp" srcset="assets/img/hero-colecao.webp">
+        <source media="(max-width: 900px)" srcset="assets/img/hero-colecao-900.jpg">
+        <img src="assets/img/hero-colecao.jpg" alt="Time vestindo a coleção G4 Store em ambiente corporativo" width="1800" height="1013" fetchpriority="high">
+      </picture>
     </div>
     <div class="wrap hero__inner">
       <div class="hero__copy">
         <span class="eyebrow">G4 Store</span>
-        <h1>Para quem<br>quer mais</h1>
+        <h1>Para quem quer mais</h1>
         <p>Vista a mentalidade de quem transforma conhecimento em resultado</p>
         <a class="btn" href="produtos.html">Ver coleção</a>
       </div>
@@ -84,9 +98,93 @@
   </section>
 
   <!-- =========================================================== Vitrine -->
-  <section class="section">
+  <!-- Renderizada no HTML para funcionar sem JS e ser indexável. -->
+  <section class="section section--showcase">
     <div class="wrap">
-      <div class="product-grid" data-showcase></div>
+      <div class="product-grid" data-showcase data-static="1">
+
+        <article class="card reveal" style="--i:0">
+          <a class="card__media" href="produto.html?slug=camiseta-g4-classic" tabindex="-1" aria-hidden="true">
+            <picture>
+              <source type="image/webp" srcset="assets/img/produto-camiseta.webp">
+              <img src="assets/img/produto-camiseta.png" alt="Camiseta G4 Classic" width="900" height="900" sizes="(max-width: 600px) 92vw, (max-width: 1040px) 44vw, 300px">
+            </picture>
+          </a>
+          <div class="card__body">
+            <div class="card__info">
+              <h3><a href="produto.html?slug=camiseta-g4-classic">Camiseta G4 Classic</a></h3>
+              <div class="price">R$ 159,90</div>
+              <div class="installments">3x de R$ 53,30 sem juros</div>
+            </div>
+            <button class="icon-btn" type="button" data-add="camiseta-g4-classic" aria-label="Adicionar Camiseta G4 Classic à sacola">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+        </article>
+
+        <article class="card reveal" style="--i:1">
+          <a class="card__media" href="produto.html?slug=moletom-g4-essential" tabindex="-1" aria-hidden="true">
+            <span class="card__tag">Mais vendido</span>
+            <picture>
+              <source type="image/webp" srcset="assets/img/produto-moletom.webp">
+              <img src="assets/img/produto-moletom.png" alt="Moletom G4 Essential" width="900" height="900" sizes="(max-width: 600px) 92vw, (max-width: 1040px) 44vw, 300px">
+            </picture>
+          </a>
+          <div class="card__body">
+            <div class="card__info">
+              <h3><a href="produto.html?slug=moletom-g4-essential">Moletom G4 Essential</a></h3>
+              <div class="price">R$ 289,90</div>
+              <div class="installments">6x de R$ 48,32 sem juros</div>
+            </div>
+            <button class="icon-btn" type="button" data-add="moletom-g4-essential" aria-label="Adicionar Moletom G4 Essential à sacola">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+        </article>
+
+        <article class="card reveal" style="--i:2">
+          <a class="card__media" href="produto.html?slug=bone-g4-signature" tabindex="-1" aria-hidden="true">
+            <picture>
+              <source type="image/webp" srcset="assets/img/produto-bone.webp">
+              <img src="assets/img/produto-bone.png" alt="Boné G4 Signature" width="900" height="900" sizes="(max-width: 600px) 92vw, (max-width: 1040px) 44vw, 300px">
+            </picture>
+          </a>
+          <div class="card__body">
+            <div class="card__info">
+              <h3><a href="produto.html?slug=bone-g4-signature">Boné G4 Signature</a></h3>
+              <div class="price">R$ 129,90</div>
+              <div class="installments">2x de R$ 64,95 sem juros</div>
+            </div>
+            <button class="icon-btn" type="button" data-add="bone-g4-signature" aria-label="Adicionar Boné G4 Signature à sacola">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+        </article>
+
+        <article class="card reveal" style="--i:3">
+          <a class="card__media" href="produto.html?slug=garrafa-termica-g4" tabindex="-1" aria-hidden="true">
+            <picture>
+              <source type="image/webp" srcset="assets/img/produto-garrafa.webp">
+              <img src="assets/img/produto-garrafa.png" alt="Garrafa Térmica G4" width="900" height="900" sizes="(max-width: 600px) 92vw, (max-width: 1040px) 44vw, 300px">
+            </picture>
+          </a>
+          <div class="card__body">
+            <div class="card__info">
+              <h3><a href="produto.html?slug=garrafa-termica-g4">Garrafa Térmica G4</a></h3>
+              <div class="price">R$ 189,90</div>
+              <div class="installments">3x de R$ 63,30 sem juros</div>
+            </div>
+            <button class="icon-btn" type="button" data-add="garrafa-termica-g4" aria-label="Adicionar Garrafa Térmica G4 à sacola">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+        </article>
+
+      </div>
+
+      <p style="margin:34px 0 0;text-align:center">
+        <a class="link-arrow" href="produtos.html">Ver os 10 produtos da coleção &rarr;</a>
+      </p>
     </div>
   </section>
 
@@ -124,24 +222,24 @@
       </div>
 
       <div class="cat-grid">
-        <a class="cat reveal" href="produtos.html?q=vestuário">
-          <img src="assets/img/produto-moletom.jpg" alt="">
+        <a class="cat cat--product reveal" href="produtos.html?q=vestuário">
+          <img src="assets/img/produto-moletom.png" alt="" width="900" height="900" loading="lazy">
           <div class="cat__content">
             <span class="eyebrow eyebrow--plain">01</span>
             <h3>Vestuário</h3>
-            <p>Camisetas e moletons com caimento pensado para o uso diário</p>
+            <p>Camisetas, moletons, jaqueta e jogger com caimento para o uso diário</p>
           </div>
         </a>
-        <a class="cat reveal" href="produtos.html?q=acessórios">
-          <img src="assets/img/produto-bone.jpg" alt="">
+        <a class="cat cat--product reveal" href="produtos.html?q=acessórios">
+          <img src="assets/img/produto-bone.png" alt="" width="900" height="900" loading="lazy">
           <div class="cat__content">
             <span class="eyebrow eyebrow--plain">02</span>
             <h3>Acessórios</h3>
-            <p>Bonés e garrafas para completar o kit de quem está sempre em movimento</p>
+            <p>Boné, garrafa, mochila, caneca e meias para quem está sempre em movimento</p>
           </div>
         </a>
         <a class="cat reveal" href="sobre.html">
-          <img src="assets/img/hero-colecao.jpg" alt="">
+          <img src="assets/img/hero-colecao-900.jpg" alt="" width="900" height="506" loading="lazy">
           <div class="cat__content">
             <span class="eyebrow eyebrow--plain">03</span>
             <h3>Para times</h3>
@@ -161,11 +259,11 @@
         <p>A G4 Store nasce da mesma convicção que move a G4: só ensina quem faz. Cada peça é pensada para quem constrói empresa de verdade — sóbria, resistente e feita para o uso do dia a dia</p>
         <p>Materiais selecionados, produção nacional e um monograma discreto. Nada além do necessário</p>
       </div>
-      <div class="stats reveal">
-        <div class="stat"><strong>+50 mil</strong><span>Empresários impactados pelo ecossistema G4</span></div>
-        <div class="stat"><strong>+2 mil</strong><span>Empresas acompanhadas em processos de crescimento</span></div>
-        <div class="stat"><strong>100%</strong><span>Produção nacional com fornecedores auditados</span></div>
-        <div class="stat"><strong>7 dias</strong><span>Para troca sem burocracia após o recebimento</span></div>
+      <div class="stats">
+        <div class="stat reveal"><strong>+50 mil</strong><span>Empresários impactados pelo ecossistema G4</span></div>
+        <div class="stat reveal"><strong>+2 mil</strong><span>Empresas acompanhadas em processos de crescimento</span></div>
+        <div class="stat reveal"><strong>100%</strong><span>Produção nacional com fornecedores auditados</span></div>
+        <div class="stat reveal"><strong>7 dias</strong><span>Para troca sem burocracia após o recebimento</span></div>
       </div>
     </div>
   </section>
