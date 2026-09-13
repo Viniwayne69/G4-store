@@ -394,26 +394,28 @@
           var line = product.price * item.qty;
           subtotal += line;
           return (
-            "<tr>" +
-            '<td><div class="cart-item">' +
-            '<img src="' +
+            '<li class="cart-row">' +
+            '<img class="cart-row__img" src="' +
             product.image +
             '" alt="" width="900" height="900" loading="lazy">' +
-            "<div><strong>" +
+            '<div class="cart-row__info">' +
+            "<strong>" +
             product.name +
-            "</strong><br><span>" +
+            "</strong>" +
+            '<span class="cart-row__meta">' +
             product.categoryLabel +
-            "</span></div></div></td>" +
-            "<td>" +
+            "</span>" +
+            '<span class="cart-row__unit">' +
             money(product.price) +
-            "</td>" +
-            '<td><span class="qty">' +
+            " a unidade</span>" +
+            "</div>" +
+            '<div class="cart-row__qty"><span class="qty">' +
             '<button type="button" data-dec="' +
             product.slug +
             '" aria-label="Diminuir quantidade de ' +
             product.name +
             '">&minus;</button>' +
-            "<span>" +
+            '<span aria-live="polite">' +
             item.qty +
             "</span>" +
             '<button type="button" data-inc="' +
@@ -421,14 +423,20 @@
             '" aria-label="Aumentar quantidade de ' +
             product.name +
             '">+</button>' +
-            "</span></td>" +
-            "<td><strong>" +
+            "</span></div>" +
+            '<div class="cart-row__total">' +
             money(line) +
-            "</strong></td>" +
-            '<td style="text-align:right"><button class="cart-remove" type="button" data-remove="' +
+            "</div>" +
+            '<button class="cart-row__remove" type="button" data-remove="' +
             product.slug +
-            '">Remover</button></td>' +
-            "</tr>"
+            '" aria-label="Remover ' +
+            product.name +
+            ' da sacola">' +
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+            'stroke-width="1.8" stroke-linecap="round" aria-hidden="true">' +
+            '<path d="M6 6l12 12M18 6 6 18"/></svg>' +
+            "</button>" +
+            "</li>"
           );
         })
         .join("");
@@ -438,11 +446,9 @@
       var missing = FREE_SHIPPING - subtotal;
 
       root.innerHTML =
-        '<table class="cart-table"><thead><tr>' +
-        "<th>Produto</th><th>Preço</th><th>Qtd.</th><th>Total</th><th></th>" +
-        "</tr></thead><tbody>" +
+        '<ul class="cart-list">' +
         rows +
-        "</tbody></table>" +
+        "</ul>" +
         '<div class="cart-summary">' +
         '<div class="cart-summary__row"><span>Subtotal</span><span>' +
         money(subtotal) +
@@ -562,7 +568,7 @@
       var msg = document.querySelector("[data-newsletter-msg]");
       if (msg) {
         msg.textContent =
-          "Inscrição registrada, você receberá as novidades da G4 Store";
+          "Inscrição registrada, você receberá as novidades do G4 Store";
       }
       form.reset();
     });

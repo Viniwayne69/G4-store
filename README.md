@@ -1,6 +1,6 @@
 # G4 Store
 
-Interface de e-commerce da G4 Store, construída a partir do mockup de referência:
+Interface de e-commerce do G4 Store, construída a partir do mockup de referência:
 azul-marinho, branco e dourado, com header e hero em navy e vitrine em fundo claro.
 
 ## Como abrir
