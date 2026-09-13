@@ -69,7 +69,7 @@
     if (!found) cart.push({ slug: slug, qty: 1 });
 
     writeCart(cart);
-    toast(product.name + " adicionado à sacola.");
+    toast(product.name + " adicionado à sacola");
   }
 
   function setQty(slug, qty) {
@@ -287,7 +287,7 @@
       var cart = readCart();
       if (!cart.length) {
         root.innerHTML =
-          '<p class="empty">Sua sacola está vazia. ' +
+          '<p class="empty">Sua sacola está vazia &mdash; ' +
           '<a class="link-arrow" href="produtos.html">Ver produtos &rarr;</a></p>';
         return;
       }
@@ -386,7 +386,7 @@
         setQty(remove.getAttribute("data-remove"), 0);
         paint();
       } else if (checkout) {
-        toast("Checkout de demonstração: integração de pagamento pendente.");
+        toast("Checkout de demonstração: integração de pagamento pendente");
       }
     });
 
@@ -438,7 +438,7 @@
       var msg = document.querySelector("[data-newsletter-msg]");
       if (msg) {
         msg.textContent =
-          "Inscrição registrada. Você receberá as novidades da G4 Store.";
+          "Inscrição registrada, você receberá as novidades da G4 Store";
       }
       form.reset();
     });
